@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package grpc;
+
+option go_package = "pkg/grpc/pb/grpc_pb.proto";
+
+service ScannerSmartCard{
+    rpc GetSmartCardInfo(AddRequest) returns (AddResponse){}
+}
+
+message AddRequest{
+    string src = 1;
+}
+
+message AddResponse{
+    string src = 1;
+    string error_text = 2;
+}
