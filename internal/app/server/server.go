@@ -12,9 +12,9 @@ import (
 func Run() {
 	logger, _ := log.GetLogger()
 
-	s := grpc.NewServer()
-	srv := &remote.GRPCServer{}
-	api.RegisterScannerSmartCardServer(s, srv)
+	server := grpc.NewServer()
+	customGrpcServer := &remote.GRPCServer{}
+	api.RegisterScannerSmartCardServer(server, customGrpcServer)
 	logger.Jrn.Println("Register method")
 
 	l, err := net.Listen("tcp", ":8080")
@@ -22,7 +22,7 @@ func Run() {
 		logger.Jrn.Println(err)
 	}
 
-	if err := s.Serve(l); err != nil {
+	if err := server.Serve(l); err != nil {
 		logger.Jrn.Println(err)
 	}
 	logger.Jrn.Println("Shutdown")
