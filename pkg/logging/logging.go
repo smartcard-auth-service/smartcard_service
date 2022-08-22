@@ -7,15 +7,15 @@ import (
 	"log"
 )
 
-type Logger struct {
+type CustomLogger struct {
 	filename string
-	*log.Logger
+	Jrn      *log.Logger
 }
 
-var logger *Logger
+var logger *CustomLogger
 var once sync.Once
 
-func GetLogger() (*Logger, error) {
+func GetLogger() (*CustomLogger, error) {
 	var errCreateLogger error
 	once.Do(func() {
 		logger, errCreateLogger = createLogger("logs/service.log")
@@ -23,11 +23,11 @@ func GetLogger() (*Logger, error) {
 	return logger, errCreateLogger
 }
 
-func createLogger(fname string) (*Logger, error) {
+func createLogger(fname string) (*CustomLogger, error) {
 	file, err := os.OpenFile(fname, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0777)
 
-	return &Logger{
+	return &CustomLogger{
 		filename: fname,
-		Logger:   log.New(file, "My app Name ", log.Lshortfile),
+		Jrn:      log.New(file, "My app Name ", log.Lshortfile),
 	}, err
 }
