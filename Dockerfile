@@ -1,11 +1,11 @@
-# syntax=docker/dockerfil1e:1
-FROM golang:1.16-alpine
-WORKDIR /smartcard_service
-COPY go.mod ./
-COPY go.sum ./
-COPY cmd/ /smartcard_service/cmd/
-COPY internal/ /smartcard_service/internal/
-COPY pkg/ /smartcard_service/pkg/
-RUN go mod download
-RUN go run cmd/main.go
-USER tatun2000
+FROM golang:1.19-alpine3.16 AS build-stage
+WORKDIR /artifacts
+COPY go.mod go.sum ./
+RUN GOOS=linux GOARCH=amd64 go mod download
+COPY . .
+RUN GOOS=linux GOARCH=amd64 go build -o smartcard-service cmd/main.go
+
+FROM --platform=linux/amd64 alpine:3.16
+WORKDIR /app
+COPY --from=build-stage /artifacts/smartcard-service .
+CMD ["/app/smartcard-service"]
