@@ -11,10 +11,9 @@ import (
 )
 
 func InitMongoConnection(ctx context.Context) *mongocontrol.MgoDriver {
-	logger := ctx.Value("logger").(*log.CustomLogger)
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(config.MongoURI))
 	if err != nil {
-		logger.Jrn.Fatalf("Connection establishment error %v", err)
+		log.Logger.Jrn.Fatalf("Connection establishment error %v", err)
 	}
 	return &mongocontrol.MgoDriver{
 		Ctx:       ctx,

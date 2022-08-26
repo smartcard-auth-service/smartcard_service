@@ -12,15 +12,15 @@ type CustomLogger struct {
 	Jrn      *log.Logger
 }
 
-var logger *CustomLogger
+var Logger *CustomLogger
 var once sync.Once
 
-func GetLogger() (*CustomLogger, error) {
+func InitLogger() error {
 	var errCreateLogger error
 	once.Do(func() {
-		logger, errCreateLogger = createLogger("logs/service.log")
+		Logger, errCreateLogger = createLogger("logs/service.log")
 	})
-	return logger, errCreateLogger
+	return errCreateLogger
 }
 
 func createLogger(fname string) (*CustomLogger, error) {

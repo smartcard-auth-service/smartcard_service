@@ -13,32 +13,31 @@ import (
 )
 
 func Run() {
-	ctx := getCtx()
-	logger := ctx.Value("logger").(*log.CustomLogger)
+	ctx := context.Background()
+	err := log.InitLogger()
+	if err != nil {
+		fatal(err)
+	}
 
 	mongoConn := client.InitMongoConnection(ctx)
+	//defer client.Close(mongoConn)
+
 	server := grpc.NewServer()
+
 	customGrpcServer := &remote.GRPCServer{}
 	api.RegisterScannerSmartCardServer(server, customGrpcServer)
-	logger.Jrn.Println("Register method")
+	log.Logger.Jrn.Println("Register method")
 
 	listener, err := net.Listen("tcp", ":8080")
 	if err != nil {
-		logger.Jrn.Println(err)
+		log.Logger.Jrn.Println(err)
 	}
 
 	if err := server.Serve(listener); err != nil {
-		logger.Jrn.Println(err)
+		log.Logger.Jrn.Println(err)
 	}
-	logger.Jrn.Println("Shutdown")
+	log.Logger.Jrn.Println("Shutdown")
 }
 
 // Я в качестве клиента вызываю методы на получение данных с rust_server
 // В качестве сервера регистрирую методы, которые будут отправлять данные на rust_server
-
-func getCtx() context.Context {
-	ctx := context.Background()
-	logger, _ := log.GetLogger()
-	ctx = context.WithValue(ctx, "logger", logger)
-	return ctx
-}
