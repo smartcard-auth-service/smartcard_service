@@ -11,7 +11,7 @@ import (
 )
 
 func InitMongoConnection(ctx context.Context) *mongocontrol.MgoDriver {
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(config.MongoURI))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(config.Cfg.MONGO_URI))
 	if err != nil {
 		log.Logger.Jrn.Fatalf("Connection establishment error %v", err)
 	}
