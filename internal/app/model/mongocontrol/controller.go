@@ -12,6 +12,7 @@ var (
 	FAILED  StateOper = "Failed"
 )
 
+// to do подумать, как избавиться от зависимости *MgoDriver в этих методах (Вариант с sync.once кажется костыльным)
 func GetOne(mgo *MgoDriver, dbName string, collectionName string, query bson.M, opts *options.FindOptions) {
 
 }
@@ -20,7 +21,7 @@ func GetMany(mgo *MgoDriver) {
 
 }
 
-func AddOne(mgo *MgoDriver) {
+func AddOne(mgo *MgoDriver, dbName string, collectionName string, query bson.M, opts *options.FindOptions) {
 
 }
 
