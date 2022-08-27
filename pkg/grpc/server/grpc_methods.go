@@ -15,8 +15,9 @@ func (s *GRPCServer) RegisterCardData(ctx context.Context, req *api.RegistrateRe
 		log.Logger.Jrn.Printf("Error Unmarshal = %v\n", err)
 		errText = fmt.Sprintf("Error Unmarshal card data : %v", err)
 	}
-	// to do : add implemention method mongocontrol.AddOne
 
+	// to do : add implemention method mongocontrol.AddOne
+	mongocontrol.AddOne(regCardData)
 	response := &api.RegistrateResponse{
 		Status:    string(mongocontrol.SUCCESS),
 		ErrorText: errText,

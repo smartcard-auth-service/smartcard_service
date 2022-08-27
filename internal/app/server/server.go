@@ -2,14 +2,10 @@ package server
 
 import (
 	"context"
-	"net"
 
-	"smartcard/internal/app/model/mongocontrol/client"
-	api "smartcard/pkg/grpc/api"
-	remote "smartcard/pkg/grpc/grpc_methods"
+	"smartcard/internal/app/model/client"
+	grpcServ "smartcard/pkg/grpc/server"
 	log "smartcard/pkg/logging"
-
-	"google.golang.org/grpc"
 )
 
 func Run() {
@@ -19,23 +15,10 @@ func Run() {
 		fatal(err)
 	}
 
-	mongoConn := client.InitMongoConnection(ctx)
+	client.InitMongoConnection(ctx)
 	//defer client.Close(mongoConn)
+	grpcServ.Run()
 
-	server := grpc.NewServer()
-
-	customGrpcServer := &remote.GRPCServer{}
-	api.RegisterScannerSmartCardServer(server, customGrpcServer)
-	log.Logger.Jrn.Println("Register method")
-
-	listener, err := net.Listen("tcp", ":8080")
-	if err != nil {
-		log.Logger.Jrn.Println(err)
-	}
-
-	if err := server.Serve(listener); err != nil {
-		log.Logger.Jrn.Println(err)
-	}
 	log.Logger.Jrn.Println("Shutdown")
 }
 

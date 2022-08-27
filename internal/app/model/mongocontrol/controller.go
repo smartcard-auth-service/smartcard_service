@@ -13,18 +13,20 @@ var (
 )
 
 // to do подумать, как избавиться от зависимости *MgoDriver в этих методах (Вариант с sync.once кажется костыльным)
-func GetOne(mgo *MgoDriver, dbName string, collectionName string, query bson.M, opts *options.FindOptions) {
+// to do запихнуть это выше mongocontrol
+func GetOne(dbName string, collectionName string, query bson.M, opts *options.FindOptions) {
 
 }
 
-func GetMany(mgo *MgoDriver) {
+/* func GetMany(mgo *MgoDriver) {
+
+} */
+
+func AddOne(card *CardData) {
 
 }
 
-func AddOne(mgo *MgoDriver, dbName string, collectionName string, query bson.M, opts *options.FindOptions) {
+/* func UpdateOne(mgo *MgoDriver) {
 
 }
-
-func UpdateOne(mgo *MgoDriver) {
-
-}
+*/

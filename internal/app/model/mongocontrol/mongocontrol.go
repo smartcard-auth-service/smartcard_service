@@ -9,12 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type MgoDriver struct {
-	Ctx       context.Context
-	MgoClient *mongo.Client
-}
-
-func (mgo *MgoDriver) GetDataOne(ctx context.Context, collectionName *mongo.Collection, query bson.M, opts *options.FindOneOptions) (*CardData, error) {
+func GetDataOne(ctx context.Context, collectionName *mongo.Collection, query bson.M, opts *options.FindOneOptions) (*CardData, error) {
 	var result CardData
 	err := collectionName.FindOne(ctx, query, opts).Decode(&result)
 	if err != nil {
@@ -27,7 +22,7 @@ func (mgo *MgoDriver) GetDataOne(ctx context.Context, collectionName *mongo.Coll
 	return &result, err
 }
 
-func (mgo *MgoDriver) GetDataMany(ctx context.Context, collectionName *mongo.Collection, query bson.M, opts *options.FindOptions) ([]*CardData, error) {
+func GetDataMany(ctx context.Context, collectionName *mongo.Collection, query bson.M, opts *options.FindOptions) ([]*CardData, error) {
 	var result []*CardData
 	cursor, err := collectionName.Find(ctx, query, opts)
 	if err != nil {
@@ -45,18 +40,19 @@ func (mgo *MgoDriver) GetDataMany(ctx context.Context, collectionName *mongo.Col
 	return result, nil
 }
 
-func (mgo *MgoDriver) UpdateOne() {
+/* func UpdateOne() {
 
 }
 
-func (mgo *MgoDriver) UpdateMany() {
+func UpdateMany() {
 
 }
 
-func (mgo *MgoDriver) InsertOne() {
+func InsertOne() {
 
 }
 
-func (mgo *MgoDriver) InsertMany() {
+func InsertMany() {
 
 }
+*/
