@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package grpc;
+
+option go_package = "pkg/grpc/pb/grpc_pb.proto";
+
+service ScannerSmartCard{
+    // RegisterCardData performs registration card in db (info about card sends @openmind3d in RegistrateRequest.regData)
+    rpc RegisterCardData(RegistrateRequest) returns (RegistrateResponse){} // server -> repo: smartcard_servce, client -> repo: smartcard-reader
+
+    // GetCardData performs query on getting CardData from db (@openmind3d entered in GetDataRequest only object id)
+    rpc GetCardData(GetDataRequest) returns (GetDataResponse){} // server -> repo: smartcard_servce, client -> repo: smartcard-reader
+}
+
+message RegistrateRequest{
+    bytes regData = 1; 
+}
+
+message RegistrateResponse{
+    string status = 1;
+    string error_text = 2;
+}
+
+message GetDataRequest{
+    bytes getData = 1; // сюда передаём _id
+}
+
+message GetDataResponse{
+    bytes data = 1;
+    string status = 2;
+    string error_text = 3;
+}

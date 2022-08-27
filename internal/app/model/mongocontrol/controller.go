@@ -5,18 +5,25 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func GetData(mgo *MgoDriver, dbName string, collectionName string, query bson.M, opts *options.FindOptions) {
+type StateOper string
+
+var (
+	SUCCESS StateOper = "Success"
+	FAILED  StateOper = "Failed"
+)
+
+func GetOne(mgo *MgoDriver, dbName string, collectionName string, query bson.M, opts *options.FindOptions) {
 
 }
 
-func GetDataMany(mgo *MgoDriver) {
+func GetMany(mgo *MgoDriver) {
 
 }
 
-func AddData(mgo *MgoDriver) {
+func AddOne(mgo *MgoDriver) {
 
 }
 
-func UpdateData(mgo *MgoDriver) {
+func UpdateOne(mgo *MgoDriver) {
 
 }

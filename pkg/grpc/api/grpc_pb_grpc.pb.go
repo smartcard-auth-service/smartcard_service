@@ -22,7 +22,10 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ScannerSmartCardClient interface {
-	GetSmartCardInfo(ctx context.Context, in *AddRequest, opts ...grpc.CallOption) (*AddResponse, error)
+	// RegisterCardData performs registration card in db (info about card sends @openmind3d in RegistrateRequest.regData)
+	RegisterCardData(ctx context.Context, in *RegistrateRequest, opts ...grpc.CallOption) (*RegistrateResponse, error)
+	// GetCardData performs query on getting CardData from db (@openmind3d entered in GetDataRequest only object id)
+	GetCardData(ctx context.Context, in *GetDataRequest, opts ...grpc.CallOption) (*GetDataResponse, error)
 }
 
 type scannerSmartCardClient struct {
@@ -33,9 +36,18 @@ func NewScannerSmartCardClient(cc grpc.ClientConnInterface) ScannerSmartCardClie
 	return &scannerSmartCardClient{cc}
 }
 
-func (c *scannerSmartCardClient) GetSmartCardInfo(ctx context.Context, in *AddRequest, opts ...grpc.CallOption) (*AddResponse, error) {
-	out := new(AddResponse)
-	err := c.cc.Invoke(ctx, "/grpc.ScannerSmartCard/GetSmartCardInfo", in, out, opts...)
+func (c *scannerSmartCardClient) RegisterCardData(ctx context.Context, in *RegistrateRequest, opts ...grpc.CallOption) (*RegistrateResponse, error) {
+	out := new(RegistrateResponse)
+	err := c.cc.Invoke(ctx, "/grpc.ScannerSmartCard/RegisterCardData", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *scannerSmartCardClient) GetCardData(ctx context.Context, in *GetDataRequest, opts ...grpc.CallOption) (*GetDataResponse, error) {
+	out := new(GetDataResponse)
+	err := c.cc.Invoke(ctx, "/grpc.ScannerSmartCard/GetCardData", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +58,10 @@ func (c *scannerSmartCardClient) GetSmartCardInfo(ctx context.Context, in *AddRe
 // All implementations must embed UnimplementedScannerSmartCardServer
 // for forward compatibility
 type ScannerSmartCardServer interface {
-	GetSmartCardInfo(context.Context, *AddRequest) (*AddResponse, error)
+	// RegisterCardData performs registration card in db (info about card sends @openmind3d in RegistrateRequest.regData)
+	RegisterCardData(context.Context, *RegistrateRequest) (*RegistrateResponse, error)
+	// GetCardData performs query on getting CardData from db (@openmind3d entered in GetDataRequest only object id)
+	GetCardData(context.Context, *GetDataRequest) (*GetDataResponse, error)
 	mustEmbedUnimplementedScannerSmartCardServer()
 }
 
@@ -54,8 +69,11 @@ type ScannerSmartCardServer interface {
 type UnimplementedScannerSmartCardServer struct {
 }
 
-func (UnimplementedScannerSmartCardServer) GetSmartCardInfo(context.Context, *AddRequest) (*AddResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetSmartCardInfo not implemented")
+func (UnimplementedScannerSmartCardServer) RegisterCardData(context.Context, *RegistrateRequest) (*RegistrateResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RegisterCardData not implemented")
+}
+func (UnimplementedScannerSmartCardServer) GetCardData(context.Context, *GetDataRequest) (*GetDataResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCardData not implemented")
 }
 func (UnimplementedScannerSmartCardServer) mustEmbedUnimplementedScannerSmartCardServer() {}
 
@@ -70,20 +88,38 @@ func RegisterScannerSmartCardServer(s grpc.ServiceRegistrar, srv ScannerSmartCar
 	s.RegisterService(&ScannerSmartCard_ServiceDesc, srv)
 }
 
-func _ScannerSmartCard_GetSmartCardInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AddRequest)
+func _ScannerSmartCard_RegisterCardData_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RegistrateRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ScannerSmartCardServer).GetSmartCardInfo(ctx, in)
+		return srv.(ScannerSmartCardServer).RegisterCardData(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/grpc.ScannerSmartCard/GetSmartCardInfo",
+		FullMethod: "/grpc.ScannerSmartCard/RegisterCardData",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ScannerSmartCardServer).GetSmartCardInfo(ctx, req.(*AddRequest))
+		return srv.(ScannerSmartCardServer).RegisterCardData(ctx, req.(*RegistrateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ScannerSmartCard_GetCardData_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetDataRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ScannerSmartCardServer).GetCardData(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/grpc.ScannerSmartCard/GetCardData",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ScannerSmartCardServer).GetCardData(ctx, req.(*GetDataRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -96,8 +132,12 @@ var ScannerSmartCard_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*ScannerSmartCardServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GetSmartCardInfo",
-			Handler:    _ScannerSmartCard_GetSmartCardInfo_Handler,
+			MethodName: "RegisterCardData",
+			Handler:    _ScannerSmartCard_RegisterCardData_Handler,
+		},
+		{
+			MethodName: "GetCardData",
+			Handler:    _ScannerSmartCard_GetCardData_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
