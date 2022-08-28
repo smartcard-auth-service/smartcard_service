@@ -3,24 +3,28 @@ package server
 import (
 	"context"
 
+	"smartcard/config"
 	"smartcard/internal/app/model/client"
 	grpcServ "smartcard/pkg/grpc/server"
 	log "smartcard/pkg/logging"
 )
 
 func Run() {
+	var mgoDriver *client.MgoDriver
 	ctx := context.Background()
-	err := log.InitLogger()
-	if err != nil {
-		fatal(err)
-	}
+	initServer(ctx, mgoDriver)
 
-	mgoDriver := client.InitMongoConnection(ctx)
 	//defer client.Close(mongoConn)
 	grpcServ.Run(mgoDriver)
 
-	log.Logger.Jrn.Println("Shutdown")
+	log.Logger.Jrn.Println("Shutdown server")
 }
 
-// Я в качестве клиента вызываю методы на получение данных с rust_server
-// В качестве сервера регистрирую методы, которые будут отправлять данные на rust_server
+func initServer(ctx context.Context, mgoDriver *client.MgoDriver) {
+	err := log.InitLogger()
+	if err != nil {
+		Fatal(err)
+	}
+	config.InitGlobalConfig()
+	client.InitMongoConnection(ctx, mgoDriver)
+}

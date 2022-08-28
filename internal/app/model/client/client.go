@@ -14,12 +14,12 @@ type MgoDriver struct {
 	MgoClient *mongo.Client
 }
 
-func InitMongoConnection(ctx context.Context) *MgoDriver {
+func InitMongoConnection(ctx context.Context, mgoDriver *MgoDriver) {
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(config.Cfg.MONGO_URI))
 	if err != nil {
 		log.Logger.Jrn.Fatalf("Connection establishment error %v", err)
 	}
-	return &MgoDriver{
+	mgoDriver = &MgoDriver{
 		Ctx:       ctx,
 		MgoClient: client,
 	}

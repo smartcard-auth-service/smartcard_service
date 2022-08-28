@@ -9,9 +9,9 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func GetDataOne(ctx context.Context, collectionName *mongo.Collection, query bson.M, opts *options.FindOneOptions) (*CardData, error) {
+func GetDataOne(ctx context.Context, collection *mongo.Collection, query bson.M, opts *options.FindOneOptions) (*CardData, error) {
 	var result CardData
-	err := collectionName.FindOne(ctx, query, opts).Decode(&result)
+	err := collection.FindOne(ctx, query, opts).Decode(&result)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			log.Logger.Jrn.Printf("No objects in db which match current query = %v", query)
@@ -22,9 +22,9 @@ func GetDataOne(ctx context.Context, collectionName *mongo.Collection, query bso
 	return &result, err
 }
 
-func GetDataMany(ctx context.Context, collectionName *mongo.Collection, query bson.M, opts *options.FindOptions) ([]*CardData, error) {
+func GetDataMany(ctx context.Context, collection *mongo.Collection, query bson.M, opts *options.FindOptions) ([]*CardData, error) {
 	var result []*CardData
-	cursor, err := collectionName.Find(ctx, query, opts)
+	cursor, err := collection.Find(ctx, query, opts)
 	if err != nil {
 		log.Logger.Jrn.Printf("Error getting object array = %v", err)
 		return nil, err
@@ -40,6 +40,15 @@ func GetDataMany(ctx context.Context, collectionName *mongo.Collection, query bs
 	return result, nil
 }
 
+func InsertOne(ctx context.Context, collection *mongo.Collection, document bson.D, opts *options.InsertOneOptions) (*mongo.InsertOneResult, error) {
+	result, err := collection.InsertOne(ctx, document, opts)
+	if err != nil {
+		log.Logger.Jrn.Printf("Error InsertOne = %v", err)
+		return nil, err
+	}
+	return result, nil
+}
+
 /* func UpdateOne() {
 
 }
@@ -48,9 +57,6 @@ func UpdateMany() {
 
 }
 
-func InsertOne() {
-
-}
 
 func InsertMany() {
 

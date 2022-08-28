@@ -33,13 +33,12 @@ func getEncodingCardData(card *mongocontrol.CardData) ([]byte, error) {
 }
 
 func getIdCard(req *api.GetDataRequest) (*primitive.ObjectID, error) {
-	var result *primitive.ObjectID
+	var result primitive.ObjectID
 	var err error
-	bytesSlice := req.GetId()
-	err = json.Unmarshal(bytesSlice, &result)
+	result, err = primitive.ObjectIDFromHex(req.GetId())
 	if err != nil {
-		log.Logger.Jrn.Printf("Error Unmarshal bytes to ObjectID = %v\n", err)
+		log.Logger.Jrn.Printf("Error get ObjectID from request  = %v\n", err)
 		return nil, err
 	}
-	return result, nil
+	return &result, nil
 }

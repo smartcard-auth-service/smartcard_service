@@ -4,13 +4,16 @@ import (
 	"context"
 	"fmt"
 	"smartcard/internal/app/model/client"
+	"smartcard/internal/app/model/mongocontrol"
 
 	api "smartcard/pkg/grpc/api"
 	log "smartcard/pkg/logging"
 )
 
-func (s *GRPCServer) RegisterCardData(ctx context.Context, req *api.RegistrateRequest) (*api.RegistrateResponse, error) {
+func (serv *GRPCServer) RegisterCardData(ctx context.Context, req *api.RegistrateRequest) (*api.RegistrateResponse, error) {
 	var status, errText string
+	var id string
+
 	regCardData, err := getDecodingCardData(req)
 	if err != nil {
 		log.Logger.Jrn.Printf("Error Unmarshal = %v\n", err)
@@ -18,33 +21,51 @@ func (s *GRPCServer) RegisterCardData(ctx context.Context, req *api.RegistrateRe
 		status = string(client.FAILED)
 	}
 
-	// to do : add implemention method client.AddOne
-	err = client.AddOne(regCardData)
-	if err != nil {
-		log.Logger.Jrn.Printf("Error inserting data : %v", err)
-		errText = fmt.Sprintf("Error inserting card data : %v", err)
-		status = string(client.FAILED)
+	if errText == "" {
+		id, err = serv.mongo.AddOne(ctx, regCardData)
+		if err != nil {
+			log.Logger.Jrn.Printf("Error inserting data : %v", err)
+			errText = fmt.Sprintf("Error inserting card data : %v", err)
+			status = string(client.FAILED)
+		}
 	}
 	response := &api.RegistrateResponse{
-		Status:    status,
+		Id:        id,
+		Status:    client.ConvertStatus(status),
 		ErrorText: errText,
 	}
 	return response, nil
 }
 
-func (s *GRPCServer) GetCardData(ctx context.Context, req *api.GetDataRequest) (*api.GetDataResponse, error) {
-	var errText string
-	idCard, err := getIdCard(req)
-	card, err := s.mongo.GetOne(idCard)
+func (serv *GRPCServer) GetCardData(ctx context.Context, req *api.GetDataRequest) (*api.GetDataResponse, error) {
+	var card *mongocontrol.CardData
+	var byteCard []byte
+	var status, errText string
 
-	byteCard, err := getEncodingCardData(card)
+	idCard, err := getIdCard(req)
 	if err != nil {
-		log.Logger.Jrn.Printf("Error Marshal = %v\n", err)
-		errText = fmt.Sprintf("Error Marshal bytes : %v", err)
+		errText = fmt.Sprintf("Error get ObjectID : %v", err)
+		status = string(client.FAILED)
+	}
+	if errText == "" {
+		card, err = serv.mongo.GetOne(ctx, idCard)
+		if err != nil {
+			log.Logger.Jrn.Printf("Error get data : %v", err)
+			errText = fmt.Sprintf("Error get card data : %v", err)
+			status = string(client.FAILED)
+		}
+	}
+	if errText == "" {
+		byteCard, err = getEncodingCardData(card)
+		if err != nil {
+			log.Logger.Jrn.Printf("Error Marshal = %v\n", err)
+			errText = fmt.Sprintf("Error Marshal bytes : %v", err)
+			status = string(client.FAILED)
+		}
 	}
 	response := &api.GetDataResponse{
 		Data:      byteCard,
-		Status:    string(client.SUCCESS),
+		Status:    client.ConvertStatus(status),
 		ErrorText: errText,
 	}
 	return response, nil

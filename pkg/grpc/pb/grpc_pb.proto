@@ -17,12 +17,13 @@ message RegistrateRequest{
 }
 
 message RegistrateResponse{
-    string status = 1;
-    string error_text = 2;
+    string id = 1;
+    string status = 2;
+    string error_text = 3;
 }
 
 message GetDataRequest{
-    bytes id = 1; // сюда передаём _id
+    string id = 1; // сюда передаём _id
 }
 
 message GetDataResponse{

@@ -1,5 +1,5 @@
 package server
 
-func fatal(err error) {
+func Fatal(err error) {
 	panic(err)
 }

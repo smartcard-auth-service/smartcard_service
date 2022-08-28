@@ -24,7 +24,7 @@ func InitLogger() error {
 }
 
 func createLogger(fname string) (*CustomLogger, error) {
-	file, err := os.OpenFile(fname, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0777)
+	file, err := os.OpenFile(fname, os.O_RDWR|os.O_CREATE|os.O_APPEND|os.O_TRUNC, 0777)
 
 	defaultLogger := log.New(file, "My app Name ", log.Lshortfile)
 	defaultLogger.SetFlags(1)
