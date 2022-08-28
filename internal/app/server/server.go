@@ -15,9 +15,9 @@ func Run() {
 		fatal(err)
 	}
 
-	client.InitMongoConnection(ctx)
+	mgoDriver := client.InitMongoConnection(ctx)
 	//defer client.Close(mongoConn)
-	grpcServ.Run()
+	grpcServ.Run(mgoDriver)
 
 	log.Logger.Jrn.Println("Shutdown")
 }

@@ -22,7 +22,7 @@ message RegistrateResponse{
 }
 
 message GetDataRequest{
-    bytes getData = 1; // сюда передаём _id
+    bytes id = 1; // сюда передаём _id
 }
 
 message GetDataResponse{
