@@ -14,10 +14,10 @@ func GetDataOne(ctx context.Context, collection *mongo.Collection, query bson.M,
 	err := collection.FindOne(ctx, query, opts).Decode(&result)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			log.Logger.Jrn.Printf("No objects in db which match current query = %v", query)
+			log.Logrus.Error("No objects in db which match current query = %v", query)
 			return nil, err
 		}
-		log.Logger.Jrn.Printf("Error getting object = %v", err)
+		log.Logrus.Error("Error getting object = %v", err)
 	}
 	return &result, err
 }
@@ -26,13 +26,13 @@ func GetDataMany(ctx context.Context, collection *mongo.Collection, query bson.M
 	var result []*CardData
 	cursor, err := collection.Find(ctx, query, opts)
 	if err != nil {
-		log.Logger.Jrn.Printf("Error getting object array = %v", err)
+		log.Logrus.Errorf("Error getting object array = %v", err)
 		return nil, err
 	}
 	for cursor.Next(ctx) {
 		var singleResult *CardData
 		if err = cursor.Decode(&singleResult); err != nil {
-			log.Logger.Jrn.Printf("Error getting cursor object = %v", err)
+			log.Logrus.Errorf("Error getting cursor object = %v", err)
 			return nil, err
 		}
 		result = append(result, singleResult)
@@ -43,7 +43,7 @@ func GetDataMany(ctx context.Context, collection *mongo.Collection, query bson.M
 func InsertOne(ctx context.Context, collection *mongo.Collection, document bson.D, opts *options.InsertOneOptions) (*mongo.InsertOneResult, error) {
 	result, err := collection.InsertOne(ctx, document, opts)
 	if err != nil {
-		log.Logger.Jrn.Printf("Error InsertOne = %v", err)
+		log.Logrus.Errorf("Error InsertOne = %v", err)
 		return nil, err
 	}
 	return result, nil

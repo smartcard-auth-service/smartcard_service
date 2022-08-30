@@ -2,37 +2,26 @@ package logging
 
 import (
 	"os"
-	"sync"
 
-	"log"
+	"github.com/sirupsen/logrus"
 )
 
-type CustomLogger struct {
-	filename string
-	Jrn      *log.Logger
-}
-
-var Logger *CustomLogger
-var once sync.Once
+var Logrus = logrus.New()
 
 func InitLogger() error {
-	var errCreateLogger error
-	once.Do(func() {
-		Logger, errCreateLogger = createLogger("logs/service.log")
-	})
+	errCreateLogger := createLogger("logs/service.log")
 	return errCreateLogger
 }
 
-func createLogger(fname string) (*CustomLogger, error) {
-	file, err := os.OpenFile(fname, os.O_RDWR|os.O_CREATE|os.O_APPEND|os.O_TRUNC, 0777)
-
-	defaultLogger := log.New(file, "My app Name ", log.Lshortfile)
-	defaultLogger.SetFlags(1)
-	defaultLogger.SetFlags(2)
-	defaultLogger.SetFlags(4)
-
-	return &CustomLogger{
-		filename: fname,
-		Jrn:      defaultLogger,
-	}, err
+func createLogger(fname string) error {
+	file, err := os.OpenFile(fname, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0777)
+	if err == nil {
+		Logrus.Out = file
+	} else {
+		Logrus.Info("Failed to Logrus to file, using default stderr")
+		return err
+	}
+	Logrus.SetLevel(logrus.TraceLevel)
+	Logrus.SetFormatter(&logrus.TextFormatter{})
+	return nil
 }

@@ -10,6 +10,12 @@ import (
 )
 
 func Run() {
+	defer func() {
+		rec := recover()
+		if rec != nil {
+			log.Logrus.Panic("Recovered panic ", rec)
+		}
+	}()
 	var mgoDriver *client.MgoDriver
 	ctx := context.Background()
 	initServer(ctx, mgoDriver)
@@ -17,7 +23,7 @@ func Run() {
 	//defer client.Close(mongoConn)
 	grpcServ.Run(mgoDriver)
 
-	log.Logger.Jrn.Println("Shutdown server")
+	log.Logrus.Debug("Shutdown server")
 }
 
 func initServer(ctx context.Context, mgoDriver *client.MgoDriver) {

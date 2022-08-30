@@ -17,7 +17,7 @@ type MgoDriver struct {
 func InitMongoConnection(ctx context.Context, mgoDriver *MgoDriver) {
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(config.Cfg.MONGO_URI))
 	if err != nil {
-		log.Logger.Jrn.Fatalf("Connection establishment error %v", err)
+		log.Logrus.Fatal("Connection establishment error %v", err)
 	}
 	mgoDriver = &MgoDriver{
 		Ctx:       ctx,
