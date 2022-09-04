@@ -23,5 +23,6 @@ func createLogger(fname string) error {
 	}
 	Logrus.SetLevel(logrus.TraceLevel)
 	Logrus.SetFormatter(&logrus.TextFormatter{})
+	Logrus.SetReportCaller(true)
 	return nil
 }

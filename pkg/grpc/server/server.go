@@ -6,19 +6,18 @@ import (
 	api "smartcard/pkg/grpc/api"
 	log "smartcard/pkg/logging"
 
-	"smartcard/internal/app/model/client"
-
 	"google.golang.org/grpc"
 )
 
 type GRPCServer struct {
-	Mongo *client.MgoDriver
 	api.UnimplementedScannerSmartCardServer
 }
 
-func Run(mgo *client.MgoDriver) {
+func Run() {
 	server := grpc.NewServer()
-	api.RegisterScannerSmartCardServer(server, &GRPCServer{Mongo: mgo})
+
+	grpcServer := &GRPCServer{}
+	api.RegisterScannerSmartCardServer(server, grpcServer)
 
 	listen, err := net.Listen("tcp", config.Cfg.GRPC_LISTEN_PORT)
 	if err != nil {

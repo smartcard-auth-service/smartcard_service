@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"smartcard/config"
-	"smartcard/internal/app/model/client"
+	client "smartcard/internal/app/mongo_client"
 	grpcServ "smartcard/pkg/grpc/server"
 	log "smartcard/pkg/logging"
 )
@@ -16,21 +16,20 @@ func Run() {
 			log.Logrus.Panic("Recovered panic ", rec)
 		}
 	}()
-	var mgoDriver *client.MgoDriver
 	ctx := context.Background()
-	initServer(ctx, mgoDriver)
+	initServer(ctx)
 
 	//defer client.Close(mongoConn)
-	grpcServ.Run(mgoDriver)
+	grpcServ.Run()
 
 	log.Logrus.Debug("Shutdown server")
 }
 
-func initServer(ctx context.Context, mgoDriver *client.MgoDriver) {
+func initServer(ctx context.Context) {
 	err := log.InitLogger()
 	if err != nil {
 		Fatal(err)
 	}
 	config.InitGlobalConfig()
-	client.InitMongoConnection(ctx, mgoDriver)
+	client.InitMongoConnection(ctx)
 }
