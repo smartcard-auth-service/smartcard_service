@@ -1,10 +1,12 @@
 package grpc
 
 import (
+	"context"
 	"net"
 	"smartcard/config"
 	api "smartcard/pkg/grpc/api"
 	log "smartcard/pkg/logging"
+	"sync"
 
 	"google.golang.org/grpc"
 )
@@ -13,7 +15,8 @@ type GRPCServer struct {
 	api.UnimplementedScannerSmartCardServer
 }
 
-func Run() {
+func Run(ctx context.Context, wg sync.WaitGroup) {
+	defer wg.Done()
 	server := grpc.NewServer()
 
 	grpcServer := &GRPCServer{}

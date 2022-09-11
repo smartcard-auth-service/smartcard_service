@@ -1,14 +1,15 @@
-package main
+package tls_server
 
 import (
+	"context"
 	"crypto/tls"
 	"crypto/x509"
-	"fmt"
 	"io/ioutil"
 	"net/http"
+	"smartcard/config"
+	log "smartcard/pkg/logging"
+	"sync"
 )
-
-var PORT = ":1443"
 
 type handler struct {
 }
@@ -17,10 +18,11 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	w.Write([]byte("Hello world!\n"))
 }
 
-func main() {
-	caCert, err := ioutil.ReadFile("client.crt")
+func Run(ctx context.Context, wg sync.WaitGroup) {
+	defer wg.Done()
+	caCert, err := ioutil.ReadFile(config.Cfg.TLS_CLIENT_CRT)
 	if err != nil {
-		fmt.Println(err)
+		log.Logrus.Fatalf("Error read client.crt file :%v", err)
 		return
 	}
 	caCertPool := x509.NewCertPool()
@@ -30,10 +32,10 @@ func main() {
 		ClientCAs:  caCertPool,
 	}
 	srv := &http.Server{
-		Addr:      PORT,
+		Addr:      config.Cfg.TLS_SERVER_LISTEN_PORT,
 		Handler:   &handler{},
 		TLSConfig: cfg,
 	}
-	fmt.Println("Listening to port number", PORT)
-	fmt.Println(srv.ListenAndServeTLS("server.crt", "server.key"))
+	log.Logrus.Debugf("Listening TLS server to port number :%v", config.Cfg.TLS_SERVER_LISTEN_PORT)
+	log.Logrus.Info(srv.ListenAndServeTLS(config.Cfg.TLS_SERVER_CRT, config.Cfg.TLS_SERVER_KEY))
 }

@@ -2,12 +2,16 @@ package server
 
 import (
 	"context"
+	"sync"
 
 	"smartcard/config"
-	client "smartcard/internal/app/mongo_client"
+	client "smartcard/internal/app/mongo_client/client"
 	grpcServ "smartcard/pkg/grpc/server"
 	log "smartcard/pkg/logging"
+	tlsSer "smartcard/pkg/tls/tls_server"
 )
+
+var servWg sync.WaitGroup
 
 func Run() {
 	defer func() {
@@ -19,8 +23,15 @@ func Run() {
 	ctx := context.Background()
 	initServer(ctx)
 
-	//defer client.Close(mongoConn)
-	grpcServ.Run()
+	servWg.Add(1)
+	go grpcServ.Run(ctx, servWg)
+	log.Logrus.Debug("Running rpc Server")
+
+	servWg.Add(1)
+	go tlsSer.Run(ctx, servWg)
+	log.Logrus.Debug("Running tls Server")
+
+	servWg.Wait()
 
 	log.Logrus.Debug("Shutdown server")
 }
