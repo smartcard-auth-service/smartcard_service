@@ -6,6 +6,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+var BatchCh chan []byte
+
 type CardData struct {
 	ID         primitive.ObjectID `bson:"_id" json:"_id"`
 	Owner      string             `bson:"owner" json:"owner"`

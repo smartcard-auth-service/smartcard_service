@@ -8,18 +8,18 @@ import (
 	"net/http"
 	"smartcard/config"
 	log "smartcard/pkg/logging"
+	"smartcard/pkg/tls/tls_server/handlers"
+	"smartcard/pkg/tls/tls_server/transfer"
 	"sync"
+
+	"github.com/gorilla/mux"
 )
-
-type handler struct {
-}
-
-func (h *handler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	w.Write([]byte("Hello world!\n"))
-}
 
 func Run(ctx context.Context, wg sync.WaitGroup) {
 	defer wg.Done()
+	defer transfer.CloseTransferChan()
+
+	transfer.InitTransferChan()
 	caCert, err := ioutil.ReadFile(config.Cfg.TLS_CLIENT_CRT)
 	if err != nil {
 		log.Logrus.Fatalf("Error read client.crt file :%v", err)
@@ -31,9 +31,13 @@ func Run(ctx context.Context, wg sync.WaitGroup) {
 		ClientAuth: tls.RequireAndVerifyClientCert,
 		ClientCAs:  caCertPool,
 	}
+
+	r := mux.NewRouter()
+	r.HandleFunc("/generate", handlers.GenerateOneObject)
+
 	srv := &http.Server{
 		Addr:      config.Cfg.TLS_SERVER_LISTEN_PORT,
-		Handler:   &handler{},
+		Handler:   r,
 		TLSConfig: cfg,
 	}
 	log.Logrus.Debugf("Listening TLS server to port number :%v", config.Cfg.TLS_SERVER_LISTEN_PORT)

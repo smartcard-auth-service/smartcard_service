@@ -6,9 +6,9 @@ import (
 
 	"smartcard/config"
 	client "smartcard/internal/app/mongo_client/client"
-	grpcServ "smartcard/pkg/grpc/server"
+	grpc_server "smartcard/pkg/grpc/server"
 	log "smartcard/pkg/logging"
-	tlsSer "smartcard/pkg/tls/tls_server"
+	"smartcard/pkg/tls/tls_server"
 )
 
 var servWg sync.WaitGroup
@@ -24,11 +24,11 @@ func Run() {
 	initServer(ctx)
 
 	servWg.Add(1)
-	go grpcServ.Run(ctx, servWg)
+	go grpc_server.Run(ctx, servWg)
 	log.Logrus.Debug("Running rpc Server")
 
 	servWg.Add(1)
-	go tlsSer.Run(ctx, servWg)
+	go tls_server.Run(ctx, servWg)
 	log.Logrus.Debug("Running tls Server")
 
 	servWg.Wait()
