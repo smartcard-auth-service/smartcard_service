@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -13,4 +14,9 @@ type CardData struct {
 	CVC        string             `bson:"cvc" json:"cvc"`
 	Number     string             `bson:"number" json:"number"`
 	ExpireDate time.Time          `bson:"date" json:"date"`
+}
+
+func (c *CardData) String() string {
+	return fmt.Sprintf("Owner: %v\nTypeOfCard: %v\nCVC: %v\nNumber: %v\nExpireDate: %v\n",
+		c.Owner, c.TypeOfCard, c.CVC, c.Number, c.ExpireDate)
 }

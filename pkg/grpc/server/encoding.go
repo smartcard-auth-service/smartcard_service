@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"smartcard/internal/app/mongocontrol/model"
 
-	api "smartcard/pkg/grpc/api"
 	log "smartcard/pkg/logging"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -20,7 +19,7 @@ func GetDecodingCardData(bytes []byte) (*model.CardData, error) {
 	return &result, nil
 }
 
-func getEncodingCardData(card *model.CardData) ([]byte, error) {
+func GetEncodingCardData(card *model.CardData) ([]byte, error) {
 	var result []byte
 	var err error
 	result, err = json.Marshal(card)
@@ -31,11 +30,10 @@ func getEncodingCardData(card *model.CardData) ([]byte, error) {
 	return result, nil
 }
 
-func getIdCard(req *api.GetDataRequest) (*primitive.ObjectID, error) {
+func GetIdCard(id string) (*primitive.ObjectID, error) {
 	var result primitive.ObjectID
 	var err error
-	log.Logrus.Debugf("reg = %v, type = %T", req.GetId(), req.GetId())
-	result, err = primitive.ObjectIDFromHex(req.GetId())
+	result, err = primitive.ObjectIDFromHex(id)
 	if err != nil {
 		log.Logrus.Errorf("Error get ObjectID from request  = %v", err)
 		return nil, err

@@ -18,27 +18,28 @@ func (server *GRPCServer) RegisterCardData(ctx context.Context, req *api.Registr
 		}
 	}()
 
-	var status, errText string
+	var status service.StateOper
+	var errText string
 	var id string
 
 	regCardData, err := GetDecodingCardData(req.GetRegData())
 	if err != nil {
 		log.Logrus.Errorf("Error Unmarshal = %v", err)
 		errText = fmt.Sprintf("Error Unmarshal card data : %v", err)
-		status = string(service.FAILED)
+		status = service.FAILED
 	}
 
-	if errText == "" {
+	if !service.IsFailed(status) {
 		id, err = service.AddOne(ctx, regCardData)
 		if err != nil {
 			log.Logrus.Errorf("Error inserting data : %v", err)
 			errText = fmt.Sprintf("Error inserting card data : %v", err)
-			status = string(service.FAILED)
+			status = service.FAILED
 		}
 	}
 	response := &api.RegistrateResponse{
 		Id:        id,
-		Status:    service.ConvertStatus(status),
+		Status:    service.ConvertStatus(string(status)),
 		ErrorText: errText,
 	}
 	return response, nil
@@ -54,32 +55,33 @@ func (server *GRPCServer) GetCardData(ctx context.Context, req *api.GetDataReque
 
 	var card *model.CardData
 	var byteCard []byte
-	var status, errText string
+	var status service.StateOper
+	var errText string
 
-	idCard, err := getIdCard(req)
+	idCard, err := GetIdCard(req.GetId())
 	if err != nil {
 		errText = fmt.Sprintf("Error get ObjectID : %v", err)
-		status = string(service.FAILED)
+		status = service.FAILED
 	}
-	if errText == "" {
+	if !service.IsFailed(status) {
 		card, err = service.GetOne(ctx, idCard)
 		if err != nil {
 			log.Logrus.Errorf("Error get data : %v", err)
 			errText = fmt.Sprintf("Error get card data : %v", err)
-			status = string(service.FAILED)
+			status = service.FAILED
 		}
 	}
-	if errText == "" {
-		byteCard, err = getEncodingCardData(card)
+	if !service.IsFailed(status) {
+		byteCard, err = GetEncodingCardData(card)
 		if err != nil {
 			log.Logrus.Errorf("Error Marshal = %v", err)
 			errText = fmt.Sprintf("Error Marshal bytes : %v", err)
-			status = string(service.FAILED)
+			status = service.FAILED
 		}
 	}
 	response := &api.GetDataResponse{
 		Data:      byteCard,
-		Status:    service.ConvertStatus(status),
+		Status:    service.ConvertStatus(string(status)),
 		ErrorText: errText,
 	}
 	return response, nil

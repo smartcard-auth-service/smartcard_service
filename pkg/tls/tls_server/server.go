@@ -34,7 +34,8 @@ func Run(ctx context.Context, wg sync.WaitGroup) {
 	}
 
 	r := mux.NewRouter()
-	r.HandleFunc("/generate", handlers.GenerateOneObject)
+	r.HandleFunc("/generate", handlers.GenerateHandler)
+	r.HandleFunc("/get", handlers.GetHandler)
 
 	srv := &http.Server{
 		Addr:      config.Cfg.TLS_SERVER_LISTEN_PORT,

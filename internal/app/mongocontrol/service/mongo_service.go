@@ -17,6 +17,10 @@ var (
 	FAILED  StateOper = "Failed"
 )
 
+func IsFailed(status StateOper) bool {
+	return status == FAILED
+}
+
 func ConvertStatus(status string) string {
 	if status == "" {
 		return string(SUCCESS)
