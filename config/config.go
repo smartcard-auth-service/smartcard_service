@@ -17,7 +17,13 @@ type GlobalConfig struct {
 
 func InitGlobalConfig() {
 	Cfg = &GlobalConfig{
-		MONGO_URI:        "mongodb://localhost:27017",
-		GRPC_LISTEN_PORT: ":8082",
+		MONGO_URI:              "mongodb://localhost:27017",
+		GRPC_LISTEN_PORT:       ":8082",
+		TLS_CLIENT_CRT:         "/home/dmitry/go/smartcard_service/pkg/tls/tls_client/client.crt",
+		TLS_CLIENT_KEY:         "/home/dmitry/go/smartcard_service/pkg/tls/tls_client/client.key",
+		TLS_SERVER_CRT:         "/home/dmitry/go/smartcard_service/pkg/tls/tls_server/server.crt",
+		TLS_SERVER_KEY:         "/home/dmitry/go/smartcard_service/pkg/tls/tls_server/server.key",
+		TLS_URL:                "https://localhost:1443",
+		TLS_SERVER_LISTEN_PORT: ":1443",
 	}
 }

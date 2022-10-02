@@ -1,7 +1,10 @@
 package logging
 
 import (
+	"fmt"
 	"os"
+	"path"
+	"runtime"
 
 	"github.com/sirupsen/logrus"
 )
@@ -22,7 +25,13 @@ func createLogger(fname string) error {
 		return err
 	}
 	Logrus.SetLevel(logrus.TraceLevel)
-	Logrus.SetFormatter(&logrus.TextFormatter{})
+	Logrus.SetFormatter(&logrus.TextFormatter{
+		CallerPrettyfier: func(f *runtime.Frame) (function string, file string) {
+			filename := path.Base(f.File)
+			return fmt.Sprintf("%s:%d", filename, f.Line), fmt.Sprintf("%s()", f.Function)
+		},
+		FullTimestamp: true,
+	})
 	Logrus.SetReportCaller(true)
 	return nil
 }

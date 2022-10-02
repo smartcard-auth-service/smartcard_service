@@ -9,6 +9,7 @@ import (
 	"smartcard/config"
 	log "smartcard/pkg/logging"
 	"smartcard/pkg/tls/tls_server/handlers"
+	"smartcard/pkg/tls/tls_server/listen"
 	"smartcard/pkg/tls/tls_server/transfer"
 	"sync"
 
@@ -18,8 +19,8 @@ import (
 func Run(ctx context.Context, wg sync.WaitGroup) {
 	defer wg.Done()
 	defer transfer.CloseTransferChan()
-
 	transfer.InitTransferChan()
+
 	caCert, err := ioutil.ReadFile(config.Cfg.TLS_CLIENT_CRT)
 	if err != nil {
 		log.Logrus.Fatalf("Error read client.crt file :%v", err)
@@ -40,6 +41,8 @@ func Run(ctx context.Context, wg sync.WaitGroup) {
 		Handler:   r,
 		TLSConfig: cfg,
 	}
-	log.Logrus.Debugf("Listening TLS server to port number :%v", config.Cfg.TLS_SERVER_LISTEN_PORT)
+	go listen.ListenBatch()
+
+	log.Logrus.Debugf("Listening TLS server to port number %v", config.Cfg.TLS_SERVER_LISTEN_PORT)
 	log.Logrus.Info(srv.ListenAndServeTLS(config.Cfg.TLS_SERVER_CRT, config.Cfg.TLS_SERVER_KEY))
 }

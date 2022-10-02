@@ -11,6 +11,7 @@ import (
 	"sync"
 )
 
+// Example Client
 func GetPatch(ctx context.Context, wg sync.WaitGroup) {
 	defer wg.Done()
 	URL := config.Cfg.TLS_URL

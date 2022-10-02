@@ -2,7 +2,7 @@ package grpc
 
 import (
 	"encoding/json"
-	"smartcard/internal/app/model/mongocontrol"
+	"smartcard/internal/app/mongocontrol/model"
 
 	api "smartcard/pkg/grpc/api"
 	log "smartcard/pkg/logging"
@@ -10,10 +10,9 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func getDecodingCardData(req *api.RegistrateRequest) (*mongocontrol.CardData, error) {
-	var result mongocontrol.CardData
-	bytesSlice := req.GetRegData()
-	err := json.Unmarshal(bytesSlice, &result)
+func GetDecodingCardData(bytes []byte) (*model.CardData, error) {
+	var result model.CardData
+	err := json.Unmarshal(bytes, &result)
 	if err != nil {
 		log.Logrus.Errorf("Error Unmarshal bytes to CardData = %v", err)
 		return nil, err
@@ -21,7 +20,7 @@ func getDecodingCardData(req *api.RegistrateRequest) (*mongocontrol.CardData, er
 	return &result, nil
 }
 
-func getEncodingCardData(card *mongocontrol.CardData) ([]byte, error) {
+func getEncodingCardData(card *model.CardData) ([]byte, error) {
 	var result []byte
 	var err error
 	result, err = json.Marshal(card)

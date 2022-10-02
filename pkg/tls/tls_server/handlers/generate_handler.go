@@ -3,16 +3,18 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
-	mgo "smartcard/internal/app/model/mongocontrol"
+	"smartcard/internal/app/mongocontrol/model"
 	log "smartcard/pkg/logging"
 	transfer "smartcard/pkg/tls/tls_server/transfer"
 	"time"
 )
 
+// for generate Object use
+// curl -k --cert tls_client/client.crt --key tls_client/client.key -X GET https://localhost:1443/generate
 func GenerateOneObject(w http.ResponseWriter, req *http.Request) {
 	var batch []byte
 	var err error
-	object := mgo.CardData{
+	object := model.CardData{
 		Owner:      "Dima",
 		TypeOfCard: "credit",
 		CVC:        "453",

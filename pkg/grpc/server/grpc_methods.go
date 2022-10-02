@@ -3,8 +3,8 @@ package grpc
 import (
 	"context"
 	"fmt"
-	"smartcard/internal/app/model/mongocontrol"
-	service "smartcard/internal/app/model/service"
+	"smartcard/internal/app/mongocontrol/model"
+	service "smartcard/internal/app/mongocontrol/service"
 
 	api "smartcard/pkg/grpc/api"
 	log "smartcard/pkg/logging"
@@ -21,7 +21,7 @@ func (server *GRPCServer) RegisterCardData(ctx context.Context, req *api.Registr
 	var status, errText string
 	var id string
 
-	regCardData, err := getDecodingCardData(req)
+	regCardData, err := GetDecodingCardData(req.GetRegData())
 	if err != nil {
 		log.Logrus.Errorf("Error Unmarshal = %v", err)
 		errText = fmt.Sprintf("Error Unmarshal card data : %v", err)
@@ -52,7 +52,7 @@ func (server *GRPCServer) GetCardData(ctx context.Context, req *api.GetDataReque
 		}
 	}()
 
-	var card *mongocontrol.CardData
+	var card *model.CardData
 	var byteCard []byte
 	var status, errText string
 
