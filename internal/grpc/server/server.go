@@ -4,7 +4,7 @@ import (
 	"context"
 	"net"
 	"smartcard/config"
-	api "smartcard/pkg/grpc/api"
+	api "smartcard/internal/grpc/api"
 	log "smartcard/pkg/logging"
 	"sync"
 

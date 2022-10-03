@@ -39,7 +39,7 @@ func Run() {
 func initServer(ctx context.Context) {
 	err := log.InitLogger()
 	if err != nil {
-		Fatal(err)
+		log.Logrus.Fatal("Running tls Server")
 	}
 	config.InitGlobalConfig()
 	client.InitMongoConnection(ctx)

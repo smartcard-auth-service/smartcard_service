@@ -6,7 +6,7 @@ import (
 	"smartcard/internal/app/mongocontrol/model"
 	service "smartcard/internal/app/mongocontrol/service"
 
-	api "smartcard/pkg/grpc/api"
+	api "smartcard/internal/grpc/api"
 	log "smartcard/pkg/logging"
 )
 
