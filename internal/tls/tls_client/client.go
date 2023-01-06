@@ -6,7 +6,7 @@ import (
 	"crypto/x509"
 	"io/ioutil"
 	"net/http"
-	"smartcard/config"
+	"smartcard/pkg/config"
 	log "smartcard/pkg/logging"
 	"sync"
 )

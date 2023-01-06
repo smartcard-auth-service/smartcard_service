@@ -5,6 +5,7 @@ import (
 	"os"
 	"path"
 	"runtime"
+	"smartcard/pkg/config"
 
 	"github.com/sirupsen/logrus"
 )
@@ -17,14 +18,14 @@ func InitLogger() error {
 }
 
 func createLogger(fname string) error {
-	file, err := os.OpenFile(fname, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0777)
+	file, err := os.OpenFile(fname, os.O_WRONLY|os.O_APPEND, 0777)
 	if err == nil {
 		Logrus.Out = file
 	} else {
 		Logrus.Info("Failed to Logrus to file, using default stderr")
 		return err
 	}
-	Logrus.SetLevel(logrus.TraceLevel)
+	Logrus.SetLevel(setLogLevel(config.Cfg.LOG_LEVEL))
 	Logrus.SetFormatter(&logrus.TextFormatter{
 		CallerPrettyfier: func(f *runtime.Frame) (function string, file string) {
 			filename := path.Base(f.File)
@@ -34,4 +35,25 @@ func createLogger(fname string) error {
 	})
 	Logrus.SetReportCaller(true)
 	return nil
+}
+
+func setLogLevel(level string) logrus.Level {
+	switch level {
+	case "TRACE":
+		return logrus.TraceLevel
+	case "INFO":
+		return logrus.InfoLevel
+	case "WARNING":
+		return logrus.WarnLevel
+	case "ERROR":
+		return logrus.ErrorLevel
+	case "FATAL":
+		return logrus.FatalLevel
+	case "DEBUG":
+		return logrus.DebugLevel
+	case "PANIC":
+		return logrus.PanicLevel
+	default:
+		return logrus.TraceLevel
+	}
 }

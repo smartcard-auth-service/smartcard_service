@@ -1,6 +1,6 @@
 package mongocontrol
 
-import (
+/* import (
 	"context"
 	"smartcard/internal/app/mongocontrol/model"
 	log "smartcard/pkg/logging"
@@ -8,9 +8,9 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-)
+) */
 
-func GetDataOne(ctx context.Context, collection *mongo.Collection, query bson.M, opts *options.FindOneOptions) (*model.CardData, error) {
+/* func GetDataOne(ctx context.Context, collection *mongo.Collection, query bson.M, opts *options.FindOneOptions) (*model.CardData, error) {
 	var result model.CardData
 	err := collection.FindOne(ctx, query, opts).Decode(&result)
 	if err != nil {
@@ -21,9 +21,9 @@ func GetDataOne(ctx context.Context, collection *mongo.Collection, query bson.M,
 		log.Logrus.Error("Error getting object = %v", err)
 	}
 	return &result, err
-}
+} */
 
-func GetDataMany(ctx context.Context, collection *mongo.Collection, query bson.M, opts *options.FindOptions) ([]*model.CardData, error) {
+/* func GetDataMany(ctx context.Context, collection *mongo.Collection, query bson.M, opts *options.FindOptions) ([]*model.CardData, error) {
 	var result []*model.CardData
 	cursor, err := collection.Find(ctx, query, opts)
 	if err != nil {
@@ -39,16 +39,16 @@ func GetDataMany(ctx context.Context, collection *mongo.Collection, query bson.M
 		result = append(result, singleResult)
 	}
 	return result, nil
-}
+} */
 
-func InsertOne(ctx context.Context, collection *mongo.Collection, document bson.D, opts *options.InsertOneOptions) (*mongo.InsertOneResult, error) {
+/* func InsertOne(ctx context.Context, collection *mongo.Collection, document bson.D, opts *options.InsertOneOptions) (*mongo.InsertOneResult, error) {
 	result, err := collection.InsertOne(ctx, document, opts)
 	if err != nil {
 		log.Logrus.Errorf("Error InsertOne = %v", err)
 		return nil, err
 	}
 	return result, nil
-}
+} */
 
 /* func UpdateOne() {
 

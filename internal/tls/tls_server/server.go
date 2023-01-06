@@ -6,11 +6,13 @@ import (
 	"crypto/x509"
 	"io/ioutil"
 	"net/http"
-	"smartcard/config"
+	mongo_client "smartcard/internal/app/mongo_client/client"
+	carddatacases "smartcard/internal/clearcore/use_cases/card_data_cases"
+	card_data_controller "smartcard/internal/tls/tls_server/controllers/card_data_controller"
+	"smartcard/internal/tls/tls_server/transfer"
+
+	"smartcard/pkg/config"
 	log "smartcard/pkg/logging"
-	"smartcard/pkg/tls/tls_server/handlers"
-	"smartcard/pkg/tls/tls_server/listen"
-	"smartcard/pkg/tls/tls_server/transfer"
 	"sync"
 
 	"github.com/gorilla/mux"
@@ -23,8 +25,8 @@ func Run(ctx context.Context, wg sync.WaitGroup) {
 
 	caCert, err := ioutil.ReadFile(config.Cfg.TLS_CLIENT_CRT)
 	if err != nil {
+		log.Logrus.Info("Shutdown application")
 		log.Logrus.Fatalf("Error read client.crt file :%v", err)
-		return
 	}
 	caCertPool := x509.NewCertPool()
 	caCertPool.AppendCertsFromPEM(caCert)
@@ -33,17 +35,19 @@ func Run(ctx context.Context, wg sync.WaitGroup) {
 		ClientCAs:  caCertPool,
 	}
 
+	cardDataController := card_data_controller.NewCardDataController(
+		carddatacases.NewCardDataInteractor(mongo_client.Mgo))
 	r := mux.NewRouter()
-	r.HandleFunc("/generate", handlers.GenerateHandler)
-	r.HandleFunc("/get", handlers.GetHandler)
+	r.HandleFunc("/generate", cardDataController.GenerateHandler)
+	r.HandleFunc("/get", cardDataController.GetHandler)
 
 	srv := &http.Server{
-		Addr:      config.Cfg.TLS_SERVER_LISTEN_PORT,
+		Addr:      config.Cfg.TLS_LISTEN_HOST,
 		Handler:   r,
 		TLSConfig: cfg,
 	}
-	go listen.ListenBatch()
+	go cardDataController.ListenBatch()
 
-	log.Logrus.Debugf("Listening TLS server to port number %v", config.Cfg.TLS_SERVER_LISTEN_PORT)
+	log.Logrus.Tracef("Listening TLS server to host %v", config.Cfg.TLS_LISTEN_HOST)
 	log.Logrus.Info(srv.ListenAndServeTLS(config.Cfg.TLS_SERVER_CRT, config.Cfg.TLS_SERVER_KEY))
 }

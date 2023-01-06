@@ -2,13 +2,15 @@ package server
 
 import (
 	"context"
+	"fmt"
+	"os"
 	"sync"
 
-	"smartcard/config"
 	client "smartcard/internal/app/mongo_client/client"
-	grpc_server "smartcard/pkg/grpc/server"
+	grpc_server "smartcard/internal/grpc/server"
+	"smartcard/internal/tls/tls_server"
+	"smartcard/pkg/config"
 	log "smartcard/pkg/logging"
-	"smartcard/pkg/tls/tls_server"
 )
 
 var servWg sync.WaitGroup
@@ -21,26 +23,36 @@ func Run() {
 		}
 	}()
 	ctx := context.Background()
-	initServer(ctx)
+	err := initServer(ctx)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error initializing server: %v", err)
+		os.Exit(1)
+	}
 
 	servWg.Add(1)
 	go grpc_server.Run(ctx, servWg)
-	log.Logrus.Debug("Running rpc Server")
+	log.Logrus.Trace("Running rpc Server")
 
 	servWg.Add(1)
 	go tls_server.Run(ctx, servWg)
-	log.Logrus.Debug("Running tls Server")
+	log.Logrus.Trace("Running tls Server")
 
 	servWg.Wait()
 
-	log.Logrus.Debug("Shutdown server")
+	log.Logrus.Trace("Shutdown server")
 }
 
-func initServer(ctx context.Context) {
+func initServer(ctx context.Context) error {
+	config.InitGlobalConfig()
 	err := log.InitLogger()
 	if err != nil {
-		log.Logrus.Fatal("Running tls Server")
+		fmt.Fprintf(os.Stderr, "Error init logger: %v", err)
+		return err
 	}
-	config.InitGlobalConfig()
-	client.InitMongoConnection(ctx)
+	err = client.InitMongoConnection(ctx)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error init mongo connection: %v", err)
+		return err
+	}
+	return nil
 }
