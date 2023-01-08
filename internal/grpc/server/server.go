@@ -18,7 +18,7 @@ type GRPCServer struct {
 	cardDataInteractor *carddatacases.CardDataInteractor
 }
 
-func Run(ctx context.Context, wg sync.WaitGroup) {
+func Run(ctx context.Context, wg *sync.WaitGroup) {
 	defer wg.Done()
 	server := grpc.NewServer()
 
@@ -29,13 +29,13 @@ func Run(ctx context.Context, wg sync.WaitGroup) {
 
 	listen, err := net.Listen("tcp", config.Cfg.GRPC_LISTEN_HOST)
 	if err != nil {
-		log.Logrus.Info("Shutdown application")
+		log.Logrus.Info("Shutdown grpc server")
 		log.Logrus.Fatalf("Error establishing tcp connection on host = %v, error = %v", config.Cfg.GRPC_LISTEN_HOST, err)
 	}
 	log.Logrus.Info("GRPC Server ready to accept request on host = ", config.Cfg.GRPC_LISTEN_HOST)
 	err = server.Serve(listen)
 	if err != nil {
-		log.Logrus.Info("Shutdown application")
+		log.Logrus.Info("Shutdown grpc server")
 		log.Logrus.Fatal(err)
 	}
 }

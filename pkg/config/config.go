@@ -98,7 +98,7 @@ func replaceCfgVar(r *strings.Replacer, v reflect.Value) {
 
 func (gF *GlobalConfig) setDefaultValues() {
 	if gF.MONGO_URI == "" {
-		gF.MONGO_URI = "mongodb://localhost:27017"
+		gF.MONGO_URI = "mongodb://mongo:27017"
 	}
 	if gF.GRPC_LISTEN_HOST == "" {
 		gF.GRPC_LISTEN_HOST = ":8082"

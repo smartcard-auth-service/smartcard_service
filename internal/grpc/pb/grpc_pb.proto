@@ -13,7 +13,7 @@ service ScannerSmartCard{
 }
 
 message RegistrateRequest{
-    bytes regData = 1; 
+    string regData = 1; 
 }
 
 message RegistrateResponse{
@@ -27,7 +27,7 @@ message GetDataRequest{
 }
 
 message GetDataResponse{
-    bytes data = 1;
+    string data = 1;
     string status = 2;
     string error_text = 3;
 }

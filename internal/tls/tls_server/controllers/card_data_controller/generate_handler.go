@@ -32,18 +32,16 @@ func (ctrl *CardDataController) GenerateHandler(w http.ResponseWriter, req *http
 	}
 	batch, err := json.Marshal(object)
 	if err != nil {
-		log.Logrus.Errorf("Error marshal object: %v", err)
 		errText = fmt.Sprintf("Error marshal object: %v", err)
-		status = card_data_control.FAILED
+		log.Logrus.Errorf(errText)
+		errorResponse(w, errText)
+		return
 	}
 	log.Logrus.Info("BatchInfo is ready")
 	transfer.BatchCh <- batch
 	log.Logrus.Info("BatchInfo is successful go out")
-	if err == nil && errText == "" && status == card_data_control.SUCCESS {
-		fmt.Fprintf(w, "status = %v\n", status)
-	} else {
-		fmt.Fprintf(w, "error = %v, status = %v", errText, status)
-	}
+	fmt.Fprintf(w, "status = %v\n", status)
+	fmt.Fprintf(w, "ID = %v\n", object.ID.Hex())
 }
 
 func getOwner() string {

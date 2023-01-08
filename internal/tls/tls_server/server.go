@@ -18,14 +18,14 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func Run(ctx context.Context, wg sync.WaitGroup) {
+func Run(ctx context.Context, wg *sync.WaitGroup) {
 	defer wg.Done()
 	defer transfer.CloseTransferChan()
 	transfer.InitTransferChan()
 
 	caCert, err := ioutil.ReadFile(config.Cfg.TLS_CLIENT_CRT)
 	if err != nil {
-		log.Logrus.Info("Shutdown application")
+		log.Logrus.Info("Shutdown tls server")
 		log.Logrus.Fatalf("Error read client.crt file :%v", err)
 	}
 	caCertPool := x509.NewCertPool()

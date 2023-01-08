@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.6.1
-// source: pkg/grpc/pb/grpc_pb.proto
+// source: internal/grpc/pb/grpc_pb.proto
 
 package grpc_pb_proto
 
@@ -141,5 +141,5 @@ var ScannerSmartCard_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "pkg/grpc/pb/grpc_pb.proto",
+	Metadata: "internal/grpc/pb/grpc_pb.proto",
 }

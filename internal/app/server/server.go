@@ -30,11 +30,11 @@ func Run() {
 	}
 
 	servWg.Add(1)
-	go grpc_server.Run(ctx, servWg)
+	go grpc_server.Run(ctx, &servWg)
 	log.Logrus.Trace("Running rpc Server")
 
 	servWg.Add(1)
-	go tls_server.Run(ctx, servWg)
+	go tls_server.Run(ctx, &servWg)
 	log.Logrus.Trace("Running tls Server")
 
 	servWg.Wait()

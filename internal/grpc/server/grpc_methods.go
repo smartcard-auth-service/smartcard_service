@@ -24,22 +24,20 @@ func (server *GRPCServer) RegisterCardData(ctx context.Context, req *api.Registr
 	var errText string
 	var id string
 
-	regCardData, err := conversion.GetDecodingCardData(req.GetRegData())
+	regCardData, err := conversion.GetDecodingCardData([]byte(req.GetRegData()))
 	if err != nil {
-		log.Logrus.Errorf("Error Unmarshal = %v", err)
 		errText = fmt.Sprintf("Error Unmarshal card data : %v", err)
-		status = card_data_control.FAILED
+		log.Logrus.Errorf(errText)
+		return errorRegisterCardResponse(errText), err
 	}
+	rawId, err := server.cardDataInteractor.AddOneCardData(ctx, regCardData)
+	if err != nil {
+		errText = fmt.Sprintf("Error inserting card data : %v", err)
+		log.Logrus.Errorf(errText)
+		return errorRegisterCardResponse(errText), err
+	}
+	id = rawId.Hex()
 
-	if !card_data_control.IsFailed(status) {
-		rawId, err := server.cardDataInteractor.AddOneCardData(ctx, regCardData)
-		if err != nil {
-			log.Logrus.Errorf("Error inserting data : %v", err)
-			errText = fmt.Sprintf("Error inserting card data : %v", err)
-			status = card_data_control.FAILED
-		}
-		id = rawId.Hex()
-	}
 	response := &api.RegistrateResponse{
 		Id:        id,
 		Status:    card_data_control.ConvertStatus(string(status)),
@@ -66,26 +64,35 @@ func (server *GRPCServer) GetCardData(ctx context.Context, req *api.GetDataReque
 		errText = fmt.Sprintf("Error get ObjectID : %v", err)
 		status = card_data_control.FAILED
 	}
-	if !card_data_control.IsFailed(status) {
-		card, err = server.cardDataInteractor.GetOneCardData(ctx, idCard)
-		if err != nil {
-			log.Logrus.Errorf("Error get data : %v", err)
-			errText = fmt.Sprintf("Error get card data : %v", err)
-			status = card_data_control.FAILED
-		}
+	card, err = server.cardDataInteractor.GetOneCardData(ctx, idCard)
+	if err != nil {
+		errText = fmt.Sprintf("Error get card data : %v", err)
+		log.Logrus.Errorf(errText)
+		return errorGetCardResponse(errText), err
 	}
-	if !card_data_control.IsFailed(status) {
-		byteCard, err = conversion.GetEncodingCardData(card)
-		if err != nil {
-			log.Logrus.Errorf("Error Marshal = %v", err)
-			errText = fmt.Sprintf("Error Marshal bytes : %v", err)
-			status = card_data_control.FAILED
-		}
+	byteCard, err = conversion.GetEncodingCardData(card)
+	if err != nil {
+		errText = fmt.Sprintf("Error Marshal bytes : %v", err)
+		log.Logrus.Errorf(errText)
+		return errorGetCardResponse(errText), err
 	}
+
 	response := &api.GetDataResponse{
-		Data:      byteCard,
+		Data:      string(byteCard),
 		Status:    card_data_control.ConvertStatus(string(status)),
 		ErrorText: errText,
 	}
 	return response, nil
+}
+
+func errorRegisterCardResponse(errText string) *api.RegistrateResponse {
+	return &api.RegistrateResponse{
+		ErrorText: errText,
+	}
+}
+
+func errorGetCardResponse(errText string) *api.GetDataResponse {
+	return &api.GetDataResponse{
+		ErrorText: errText,
+	}
 }

@@ -1,1 +1,14 @@
-version: '3.9'
+version: '3'
+
+services:
+  app:
+    build: .
+    container_name: smartcard_container
+    ports:
+        - 1443:1443
+        - 8082:8082
+  mongo:
+    image: mongo
+    container_name: mongo_container
+    volumes:
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro

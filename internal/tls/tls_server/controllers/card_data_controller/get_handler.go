@@ -20,45 +20,37 @@ func (ctrl *CardDataController) GetHandler(w http.ResponseWriter, req *http.Requ
 	var idCard primitive.ObjectID
 	var card *carddatacases.CardData
 	var query url.Values
-	var status card_data_control.StateOper
 	var errText string
 
-	status = card_data_control.SUCCESS
 	parseUrl, err := url.Parse(req.URL.String())
 	if err != nil {
-		log.Logrus.Errorf("Error parse url: %v", err)
 		errText = fmt.Sprintf("Error parse url :%v", err)
-		status = card_data_control.FAILED
+		log.Logrus.Errorf(errText)
+		errorResponse(w, errText)
+		return
 	}
-	if !card_data_control.IsFailed(status) {
-		query, err = url.ParseQuery(parseUrl.RawQuery)
-		if err != nil {
-			log.Logrus.Errorf("Error parse query %v Error: %v", parseUrl.RawQuery, err)
-			errText = fmt.Sprintf("Error parse query %v Error: %v", parseUrl.RawQuery, err)
-			status = card_data_control.FAILED
-		}
+	query, err = url.ParseQuery(parseUrl.RawQuery)
+	if err != nil {
+		errText = fmt.Sprintf("Error parse query %v: %v", parseUrl.RawQuery, err)
+		log.Logrus.Errorf(errText)
+		errorResponse(w, errText)
+		return
 	}
-	if !card_data_control.IsFailed(status) {
-		id := query.Get("id")
-		idCard, err = conversion.GetIdCard(id)
-		if err != nil {
-			log.Logrus.Errorf("Unable get object with id = '%v' Error %v", id, err)
-			errText = fmt.Sprintf("Unable get object with id = '%v' Error %v", id, err)
-			status = card_data_control.FAILED
-		}
+	id := query.Get("id")
+	idCard, err = conversion.GetIdCard(id)
+	if err != nil {
+		errText = fmt.Sprintf("Unable get object with id = '%v' Error %v", id, err)
+		log.Logrus.Errorf(errText)
+		errorResponse(w, errText)
+		return
 	}
-	if !card_data_control.IsFailed(status) {
-		card, err = ctrl.cardDataInteractor.GetOneCardData(context.TODO(), idCard)
-		if err != nil {
-			log.Logrus.Errorf("Error get data : %v", err)
-			errText = fmt.Sprintf("Error get card data : %v", err)
-			status = card_data_control.FAILED
-		}
+	card, err = ctrl.cardDataInteractor.GetOneCardData(context.TODO(), idCard)
+	if err != nil {
+		errText = fmt.Sprintf("Error get card data : %v", err)
+		log.Logrus.Errorf(errText)
+		errorResponse(w, errText)
+		return
 	}
-
-	if err == nil && errText == "" && status == card_data_control.SUCCESS {
-		fmt.Fprintf(w, "status = %v\ndata:\n%v", status, card.String())
-	} else {
-		fmt.Fprintf(w, "error = %v, status = %v", errText, status)
-	}
+	fmt.Fprintf(w, "status = %v\ndata:\n%v", card_data_control.SUCCESS, card.String())
+	return
 }

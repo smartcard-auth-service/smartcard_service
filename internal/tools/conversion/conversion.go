@@ -8,9 +8,9 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func GetDecodingCardData(bytes []byte) (*carddatacases.CardData, error) {
+func GetDecodingCardData(jsonData []byte) (*carddatacases.CardData, error) {
 	var result carddatacases.CardData
-	err := json.Unmarshal(bytes, &result)
+	err := json.Unmarshal(jsonData, &result)
 	if err != nil {
 		log.Logrus.Errorf("Error Unmarshal bytes to CardData = %v", err)
 		return nil, err
