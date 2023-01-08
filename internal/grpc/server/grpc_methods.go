@@ -62,7 +62,8 @@ func (server *GRPCServer) GetCardData(ctx context.Context, req *api.GetDataReque
 	idCard, err := conversion.GetIdCard(req.GetId())
 	if err != nil {
 		errText = fmt.Sprintf("Error get ObjectID : %v", err)
-		status = card_data_control.FAILED
+		log.Logrus.Errorf(errText)
+		return errorGetCardResponse(errText), err
 	}
 	card, err = server.cardDataInteractor.GetOneCardData(ctx, idCard)
 	if err != nil {
