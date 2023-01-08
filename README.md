@@ -28,6 +28,7 @@ evans --proto internal/grpc/pb/grpc_pb.proto -p 8082 repl
 ```
     {"_id": "6339b520cbb4b87871767346","type_of_card": "credit","owner": "Dima Robinson","cvc": "991","number": "5026-5061-5734-4658","date": "2018-12-10T13:45:00.000Z"}
 ```
+![image](https://user-images.githubusercontent.com/74458701/211200325-8ff1f093-f9ac-44d8-8645-aa0ac14c3168.png)
 
 
 В обоих случая должен быть получен ответ с id сохранённого объекта
